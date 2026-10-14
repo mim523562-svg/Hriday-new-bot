@@ -17,7 +17,7 @@ const path = require("path");
 
 const textAudioMap = {
 
-  " আই লাভ ইউ": [
+  "আই লাভ ইউ": [
     "https://files.catbox.moe/z96wll.mp3"
   ],
 
