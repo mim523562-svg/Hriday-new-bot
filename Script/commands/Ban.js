@@ -1,187 +1,444 @@
+
+/**
+ * ╔══════════════════════════════════════════════╗
+ * ║          🛡️ BOT AUTO BAN SYSTEM V4           ║
+ * ║       💠 HRIDOY HASAN SHANTO 💠              ║
+ * ║          MIRAI BOT - SAFE MODE               ║
+ * ╚══════════════════════════════════════════════╝
+ */
+
+const fs = require("fs-extra");
+const path = require("path");
+const moment = require("moment-timezone");
+
 module.exports.config = {
-    name: "ban",
-    version: "8.0.0",
-    hasPermssion: 2,
-    credits: "🔰𝐑𝐀𝐇𝐀𝐓 𝐈𝐒𝐋𝐀𝐌🔰",
-    description: "Global + Manual Ban System",
+    name: "botautoban",
+    version: "4.0.0",
+    hasPermssion: 0,
+    credits: "💠 HRIDOY HASAN SHANTO 💠",
+    description: "Safe bot detection with admin protection",
     commandCategory: "system",
-    usages: "-ban on/off | -ban [@mention/reply/UID/link/name] | -ban list",
-    cooldowns: 0
+    usages: "botautoban",
+    cooldowns: 5
 };
 
-async function getUIDByFullName(api, threadID, body) {
-    if (!body.includes("@")) return null;
-    const match = body.match(/@(.+)/);
-    if (!match) return null;
-    const targetName = match[1].trim().toLowerCase().replace(/\s+/g, " ");
-    const threadInfo = await api.getThreadInfo(threadID);
-    const users = threadInfo.userInfo || [];
-    const user = users.find(u => {
-        if (!u.name) return false;
-        const fullName = u.name.trim().toLowerCase().replace(/\s+/g, " ");
-        return fullName === targetName;
-    });
-    return user ? user.id : null;
-}
+// ================================================
+// ⚙️ SAFE MODE SETTINGS
+// ================================================
 
-async function getTargetUser(api, event, args, Users) {
-    let targetID;
-    let targetName;
+const SETTINGS = {
+    timezone: "Asia/Kuala_Lumpur",
+    autoBan: true,
+    minMatches: 2,
+    noticeDeleteDelay: 3000,
+    logMatches: false
+};
 
-    if (event.type === "message_reply") {
-        targetID = event.messageReply.senderID;
-    } else if (args[0]) {
-        if (args[0].indexOf(".com/") !== -1) {
-            targetID = await api.getUID(args[0]);
-        } else if (args.join().includes("@")) {
-            targetID = Object.keys(event.mentions || {})[0];
-            if (!targetID) {
-                targetID = await getUIDByFullName(api, event.threadID, args.join(" "));
-            }
-        } else {
-            targetID = args[0];
-        }
-    }
+// ================================================
+// 🔍 HIGH-CONFIDENCE BOT SIGNATURES
+// সাধারণ কথাবার্তার শব্দ ইচ্ছাকৃতভাবে বাদ দেওয়া হয়েছে
+// ================================================
 
-    if (targetID) {
-        targetName = await Users.getNameUser(targetID);
-    }
+const englishKeywords = [
+    "Command not found",
+    "The command you used",
+    "You are unable to use bot",
+    "Here Is My Prefix",
+    "Unable to re-add members",
+    "removed 1 message content:",
+    "just removed 1 attachment.",
+    "just removed 1 Attachments",
+    "The current preset is",
+    "Error in onChat: Request failed with status code 500",
+    "Error: Cannot read properties of undefined",
+    "Error: Failed to fetch list",
+    "Error: Request failed with status code 404",
+    "Request failed with status code 500.",
+    "Please provide a question or prompt.",
+    "Please provide an image URL",
+    "Platform detected: TikTok",
+    "Error api Response",
+    "This command doesn't exist",
+    "CMD Not Found",
+    "PREFIX INFO",
+    "SYSTEM PREFIX",
+    "GROUP PREFIX",
+    "Only admins can use bots",
+    "User added back automatically!",
+    "Type /ban list",
+    "Welcome to the clan",
+    "To view commands",
+    "Bot Owner",
+    "Generation failed!",
+    "Error: Failed to fetch"
+];
 
-    return { targetID, targetName };
-}
+const banglaKeywords = [
+    "⚠️ একটি ত্রুটি ঘটেছে, দয়া করে পরে আবার চেষ্টা করুন।",
+    "⚠️ দুঃখিত, আমি ইউজারটাকে আবার অ্যাড করতে পারিনি",
+    "⚠️ Sorry Boss এই আবালকে অ্যাড করলাম না",
+    "বার বার Disturb করছিস কোনো",
+    "বট বলে চলে যাস কেন",
+    "আমি এখন বস",
+    "এই কমান্ডটা শুধু আমার বস এর জন্য",
+    "User added back automatically!",
+    "গ্রুপ: ",
+    "সদস্য সংখ্যা:",
+    "যোগ করেছেন:",
+    "সিস্টেম প্রিফিক্স",
+    "গ্রুপ প্রিফিক্স",
+    "বট ডিটেক্টেড"
+];
 
-module.exports.run = async ({ event, api, Users, args }) => {
-    const { threadID, messageID } = event;
+const botKeywords = [
+    ...new Set([...englishKeywords, ...banglaKeywords])
+];
 
-    if (args[0] === "on") {
-        global.data.globalBan = true;
-        return api.sendMessage(
-            "🚫 GLOBAL BAN ON\nসব UID এখন ব্যান!",
-            threadID,
-            messageID
-        );
-    }
+// ================================================
+// 🛡️ LOAD ADMIN LIST
+// ================================================
 
-    if (args[0] === "off" && !args[1]) {
-        global.data.globalBan = false;
-        return api.sendMessage(
-            "✅ GLOBAL BAN OFF\nসব UID এখন আনব্যান!",
-            threadID,
-            messageID
-        );
-    }
+function loadAdminList() {
+    const admins = new Set();
 
-    if (args[0] === "off" && args[1]) {
-        const { targetID, targetName } = await getTargetUser(api, event, [args[1]], Users);
-        
-        if (!targetID) {
-            return api.sendMessage("❌রাহাদ বসকে ডাক দে🫩\nকীভাবে কমান্ড ব্যবহার করতে হয় শিখায় দিবো🥴", threadID, messageID);
-        }
+    // Global config
+    try {
+        const globalAdmins = global.config?.ADMINBOT;
 
-        let data = (await Users.getData(targetID)).data || {};
-        data.banned = 0;
-
-        await Users.setData(targetID, { data });
-        global.data.userBanned.delete(targetID);
-
-        const name = targetName || await Users.getNameUser(targetID);
-
-        return api.sendMessage(
-            `🔓𝗨𝗦𝗘𝗥 𝗨𝗡𝗕𝗔𝗡𝗡𝗘𝗗\n👤 ${name}\n🆔 ${targetID}`,
-            threadID,
-            messageID
-        );
-    }
-
-    if (args[0] === "list") {
-        const banned = Array.from(global.data.userBanned.entries());
-
-        if (banned.length === 0)
-            return api.sendMessage("❎ কোনো ban নাই!", threadID, messageID);
-
-        let msg = "📌𝑴𝑨𝑵𝑼𝑨𝑳 𝑩𝑨𝑵𝑵𝑬𝑫 𝑼𝑺𝑬𝑹𝑺\n\n";
-        let i = 1;
-
-        for (const [uid] of banned) {
-            const name = await Users.getNameUser(uid);
-            msg += `${i}. 👤 ${name}\n🆔 ${uid}\n\n`;
-            i++;
-        }
-
-        msg += "👉 Unban করতে চাইলে এই মেসেজে রিপ্লাই দিয়ে নাম্বার লেখো";
-
-        return api.sendMessage(msg, threadID, (err, info) => {
-            global.client.handleReply.push({
-                name: "ban",
-                messageID: info.messageID,
-                author: event.senderID,
-                banned
+        if (Array.isArray(globalAdmins)) {
+            globalAdmins.forEach(id => {
+                if (id != null) admins.add(String(id));
             });
-        });
+        }
+    } catch (error) {
+        // Ignore optional config errors
     }
 
-    const { targetID, targetName } = await getTargetUser(api, event, args, Users);
+    // Local config fallback
+    try {
+        const configPath = path.resolve(
+            __dirname,
+            "..",
+            "..",
+            "config.json"
+        );
 
-    if (!targetID) {
-        return api.sendMessage(
-            "❌রাহাদ বসকে ডাক দে🫩\nকীভাবে কমান্ড ব্যবহার করতে হয় শিখায় দিবো🥴",
-            threadID,
-            messageID
+        if (fs.existsSync(configPath)) {
+            const config = fs.readJsonSync(configPath);
+            const localAdmins = config.ADMINBOT || [];
+
+            if (Array.isArray(localAdmins)) {
+                localAdmins.forEach(id => {
+                    if (id != null) admins.add(String(id));
+                });
+            }
+        }
+    } catch (error) {
+        console.error(
+            "[BOT-AUTOBAN] Config error:",
+            error.message
         );
     }
 
-    if (global.data.userBanned.has(targetID)) {
-        return api.sendMessage(`❌ ${targetName || targetID} is already banned!`, threadID, messageID);
+    return [...admins];
+}
+
+function isAdmin(senderID) {
+    if (senderID == null) return false;
+
+    return loadAdminList().includes(String(senderID));
+}
+
+// ================================================
+// 🔎 NORMALIZE MESSAGE
+// ================================================
+
+function normalizeMessage(text) {
+    return String(text || "")
+        .normalize("NFKC")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function detectBotMessage(body) {
+    const message = normalizeMessage(body);
+
+    if (!message) {
+        return [];
     }
 
-    if (global.utils.guardAdminBan(api, targetID, threadID, messageID)) return;
+    return botKeywords.filter(keyword => {
+        const normalizedKeyword = normalizeMessage(keyword);
 
-    let data = (await Users.getData(targetID)).data || {};
+        // খুব ছোট শব্দ দিয়ে শনাক্ত করা হবে না
+        if (normalizedKeyword.length < 12) {
+            return false;
+        }
 
-    data.banned = 1;
-    data.reason = "Manual BAN";
-    data.dateAdded = new Date().toLocaleString("en-US", {
-        timeZone: "Asia/Dhaka"
+        return message.includes(normalizedKeyword);
     });
+}
 
-    await Users.setData(targetID, { data });
+// ================================================
+// 👤 GET USER NAME
+// ================================================
 
-    global.data.userBanned.set(targetID, {
-        reason: data.reason,
-        dateAdded: data.dateAdded
-    });
+async function getRealName(api, Users, senderID) {
+    try {
+        if (Users && typeof Users.getNameUser === "function") {
+            const name = await Users.getNameUser(senderID);
 
-    const name = targetName || await Users.getNameUser(targetID);
+            if (name && !/facebook user/i.test(name)) {
+                return name;
+            }
+        }
+    } catch (error) {
+        // Continue to API fallback
+    }
 
-    return api.sendMessage(
-        `🚫𝑼𝑺𝑬𝑹 𝑩𝑨𝑵𝑵𝑬𝑫\n👤 ${name}\n🆔 ${targetID}`,
+    try {
+        if (api && typeof api.getUserInfo === "function") {
+            const info = await api.getUserInfo(senderID);
+
+            if (info?.[senderID]?.name) {
+                return info[senderID].name;
+            }
+        }
+    } catch (error) {
+        // User info may be unavailable
+    }
+
+    return "Unknown User";
+}
+
+// ================================================
+// 📩 SAFE NOTICE
+// ================================================
+
+function sendNotice(api, threadID, messageID, userName, senderID) {
+    const notice = {
+        body:
+            "⚠️ সম্ভাব্য বট মেসেজ শনাক্ত হয়েছে!\n" +
+            "👤 ব্যবহারকারী: " + userName + "\n" +
+            "🛡️ Safe Mode সক্রিয়\n" +
+            "💠 HRIDOY HASAN SHANTO 💠",
+        mentions: [{
+            tag: userName,
+            id: String(senderID)
+        }]
+    };
+
+    api.sendMessage(
+        notice,
         threadID,
+        (error, info) => {
+            if (error || !info?.messageID) return;
+
+            setTimeout(() => {
+                api.unsendMessage(info.messageID, () => {});
+            }, SETTINGS.noticeDeleteDelay);
+        },
         messageID
     );
+}
+
+// ================================================
+// 🚨 EVENT HANDLER
+// ================================================
+
+module.exports.handleEvent = async function ({
+    event,
+    api,
+    Users,
+    Threads
+}) {
+    try {
+        if (!event || !api) return;
+
+        const {
+            threadID,
+            messageID,
+            senderID,
+            body
+        } = event;
+
+        if (
+            !threadID ||
+            !senderID ||
+            !body ||
+            typeof body !== "string"
+        ) {
+            return;
+        }
+
+        // নিজের বটের মেসেজ উপেক্ষা
+        if (
+            String(senderID) ===
+            String(api.getCurrentUserID())
+        ) {
+            return;
+        }
+
+        // অ্যাডমিনদের কখনো এই মডিউল থেকে ব্যান করা হবে না
+        if (isAdmin(senderID)) {
+            return;
+        }
+
+        // সম্ভাব্য বট মেসেজ শনাক্ত
+        const matches = detectBotMessage(body);
+
+        // Safe Mode: কমপক্ষে দুইটি আলাদা সিগনেচার দরকার
+        if (matches.length < SETTINGS.minMatches) {
+            return;
+        }
+
+        const userName = await getRealName(
+            api,
+            Users,
+            senderID
+        );
+
+        const time = moment()
+            .tz(SETTINGS.timezone)
+            .format("YYYY-MM-DD HH:mm:ss");
+
+        let threadName = "Unknown Group";
+
+        try {
+            if (Threads && typeof Threads.getInfo === "function") {
+                const info = await Threads.getInfo(threadID);
+                threadName = info?.threadName || threadName;
+            }
+        } catch (error) {
+            // Group name is optional
+        }
+
+        // Safe Mode: স্বয়ংক্রিয় ব্যান বন্ধ থাকলে শুধু সতর্ক করবে
+        if (!SETTINGS.autoBan) {
+            sendNotice(
+                api,
+                threadID,
+                messageID,
+                userName,
+                senderID
+            );
+            return;
+        }
+
+        // Users controller না থাকলে ব্যান করার চেষ্টা নয়
+        if (
+            !Users ||
+            typeof Users.getData !== "function" ||
+            typeof Users.setData !== "function"
+        ) {
+            console.error(
+                "[BOT-AUTOBAN] Users controller unavailable"
+            );
+            return;
+        }
+
+        // বর্তমান ডেটা নিরাপদে পড়া
+        const userData = await Users.getData(senderID);
+
+        if (!userData || typeof userData !== "object") {
+            console.error(
+                "[BOT-AUTOBAN] User data unavailable:",
+                senderID
+            );
+            return;
+        }
+
+        // আগে থেকেই ব্যান থাকলে আবার প্রক্রিয়া নয়
+        if (userData.banned === true) {
+            return;
+        }
+
+        const reason =
+            "Safe Mode bot detection: " +
+            matches.join(" | ");
+
+        userData.banned = true;
+        userData.reason = reason;
+        userData.dateAdded = time;
+        userData.threadID = String(threadID);
+        userData.threadName = threadName;
+
+        await Users.setData(senderID, {
+            data: userData
+        });
+
+        // Global ban map থাকলে সেটি আপডেট
+        if (
+            global.data?.userBanned &&
+            typeof global.data.userBanned.set === "function"
+        ) {
+            global.data.userBanned.set(String(senderID), {
+                reason,
+                dateAdded: time,
+                threadID: String(threadID),
+                threadName
+            });
+        }
+
+        if (SETTINGS.logMatches) {
+            console.log(
+                "[BOT-AUTOBAN] Detected:",
+                String(senderID),
+                matches
+            );
+        }
+
+        sendNotice(
+            api,
+            threadID,
+            messageID,
+            userName,
+            senderID
+        );
+
+    } catch (error) {
+        // অপ্রয়োজনীয় স্ট্যাক লগ এড়ানো
+        console.error(
+            "[BOT-AUTOBAN] Event error:",
+            error.message
+        );
+    }
 };
 
-module.exports.handleReply = async ({ event, api, Users, handleReply }) => {
-    if (event.senderID != handleReply.author) return;
+// ================================================
+// 📊 COMMAND STATUS
+// ================================================
 
-    const index = parseInt(event.body);
-    if (isNaN(index)) return;
+module.exports.run = async function ({ event, api }) {
+    const adminList = loadAdminList();
 
-    const user = handleReply.banned[index - 1];
-    if (!user)
-        return api.sendMessage("❌ ভুল নাম্বার!", event.threadID);
+    const status =
+        "╔══════════════════════════╗\n" +
+        "║     🛡️ BOT DETECT V4     ║\n" +
+        "╚══════════════════════════╝\n\n" +
+        "✅ System: Active\n" +
+        "🛡️ Admin Protection: ON\n" +
+        "🔍 Detection Mode: SAFE\n" +
+        "🚫 Auto Ban: " +
+        (SETTINGS.autoBan ? "ON" : "OFF") +
+        "\n" +
+        "🔑 Minimum Matches: " +
+        SETTINGS.minMatches +
+        "\n\n" +
+        "📊 English Keywords: " +
+        englishKeywords.length +
+        "\n" +
+        "📊 Bangla Keywords: " +
+        banglaKeywords.length +
+        "\n" +
+        "📊 Unique Keywords: " +
+        botKeywords.length +
+        "\n" +
+        "🛡️ Protected Admins: " +
+        adminList.length +
+        "\n\n" +
+        "💠 HRIDOY HASAN SHANTO 💠";
 
-    const uid = user[0];
-
-    let data = (await Users.getData(uid)).data || {};
-    data.banned = 0;
-
-    await Users.setData(uid, { data });
-    global.data.userBanned.delete(uid);
-
-    const name = await Users.getNameUser(uid);
-
-    return api.sendMessage(
-        `🔓𝗨𝗦𝗘𝗥 𝗨𝗡𝗕𝗔𝗡𝗡𝗘𝗗\n👤 ${name}\n🆔 ${uid}`,
-        event.threadID
-    );
+    return api.sendMessage(status, event.threadID);
 };
