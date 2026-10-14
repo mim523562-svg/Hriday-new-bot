@@ -1,393 +1,1313 @@
 <!DOCTYPE html>
-<html lang="bn">
+
+<html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
+
+
+
+  <title>SHAHADAT SAHU - PERSONAL PROFILE</title>
+
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+
+
+  <link rel="stylesheet"
+
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
 
   <style>
+
     * {
+
       margin: 0;
+
       padding: 0;
+
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+
     }
+
+
 
     body {
-      background: #080b18;
-      color: #ffffff;
-      padding-bottom: 80px;
+
+      min-height: 100vh;
+
+      padding: 25px 15px;
+
+      font-family: "Montserrat", sans-serif;
+
+      color: #fff;
+
+      background:
+
+        radial-gradient(circle at top left, rgba(139, 92, 246, .35), transparent 35%),
+
+        radial-gradient(circle at bottom right, rgba(59, 130, 246, .25), transparent 35%),
+
+        linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+
     }
 
-    .header {
-      height: 65px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      background: #11152a;
-      border-bottom: 1px solid #272d4b;
-    }
 
-    .header h2 {
-      font-size: 20px;
-    }
-
-    .user-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #12dca5, #168df5);
-      font-weight: bold;
-    }
 
     .container {
+
       width: 100%;
-      max-width: 1000px;
+
+      max-width: 450px;
+
       margin: auto;
-      padding: 18px;
+
+      padding: 25px;
+
+      border: 1px solid rgba(255,255,255,.15);
+
+      border-radius: 28px;
+
+      background: rgba(255,255,255,.08);
+
+      backdrop-filter: blur(18px);
+
+      -webkit-backdrop-filter: blur(18px);
+
+      box-shadow: 0 25px 70px rgba(0,0,0,.35);
+
     }
 
-    .welcome {
-      margin-bottom: 18px;
+
+
+    /* PROFILE */
+
+    .profile {
+
+      text-align: center;
+
     }
 
-    .welcome h3 {
-      font-size: 20px;
+
+
+    .profile-photo {
+
+      width: 125px;
+
+      height: 125px;
+
+      object-fit: cover;
+
+      border-radius: 50%;
+
+      border: 4px solid rgba(255,255,255,.9);
+
+      box-shadow: 0 10px 35px rgba(0,0,0,.35);
+
+      margin-bottom: 15px;
+
     }
 
-    .welcome p {
-      color: #9da5c3;
-      font-size: 14px;
-      margin-top: 6px;
+
+
+    .profile h1 {
+
+      font-size: 26px;
+
+      font-weight: 800;
+
+      letter-spacing: .5px;
+
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+
+
+    .tagline {
+
+      margin-top: 7px;
+
+      color: #d8d5ff;
+
+      font-size: 13px;
+
     }
+
+
+
+    /* COMMON CARD */
 
     .card {
-      min-height: 120px;
-      padding: 17px;
-      background: #15192e;
-      border: 1px solid #282e4d;
-      border-radius: 14px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
-    }
 
-    .card .emoji {
-      font-size: 25px;
-      margin-bottom: 10px;
-    }
+      margin-top: 20px;
 
-    .card h2 {
-      font-size: 24px;
-      margin-bottom: 6px;
-    }
-
-    .card p {
-      color: #969fbd;
-      font-size: 13px;
-    }
-
-    .big-card {
-      grid-column: span 2;
-    }
-
-    .panel {
-      margin-top: 18px;
       padding: 18px;
-      background: #15192e;
-      border: 1px solid #282e4d;
-      border-radius: 14px;
-    }
 
-    .panel-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-
-    .panel-title h3 {
-      font-size: 17px;
-    }
-
-    .live {
-      color: #38e6a7;
-      background: #12392f;
-      padding: 6px 11px;
       border-radius: 20px;
-      font-size: 12px;
+
+      background: rgba(255,255,255,.08);
+
+      border: 1px solid rgba(255,255,255,.12);
+
     }
 
-    .message {
-      color: #7af3be;
-      background: #10322c;
-      border: 1px solid #23725e;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 13px;
-      margin-bottom: 18px;
-    }
 
-    .chart {
-      height: 180px;
+
+    .card-title {
+
       display: flex;
-      align-items: end;
-      justify-content: space-around;
-      gap: 10px;
-      border-bottom: 1px solid #303653;
-      padding: 20px 5px 0;
-    }
 
-    .bar {
-      width: 10%;
-      position: relative;
-      border-radius: 7px 7px 0 0;
-      background: linear-gradient(to top, #16bd91, #27dce9);
-    }
-
-    .bar span {
-      position: absolute;
-      top: -22px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #aeb8d5;
-      font-size: 11px;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 13px 8px;
-      color: white;
-      background: #252c4b;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    button:hover {
-      background: #00b99b;
-    }
-
-    .bottom-menu {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 70px;
-      display: flex;
-      justify-content: space-around;
       align-items: center;
-      background: #11152a;
-      border-top: 1px solid #282e4d;
+
+      gap: 9px;
+
+      margin-bottom: 15px;
+
+      font-size: 15px;
+
+      font-weight: 700;
+
     }
 
-    .menu-item {
-      color: #929bb9;
+
+
+    /* INFO */
+
+    .info-row {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      gap: 15px;
+
+      padding: 11px 0;
+
+      border-bottom: 1px solid rgba(255,255,255,.08);
+
+      font-size: 13px;
+
+    }
+
+
+
+    .info-row:last-child {
+
+      border-bottom: none;
+
+      padding-bottom: 0;
+
+    }
+
+
+
+    .info-label {
+
+      color: #bdb9dc;
+
+    }
+
+
+
+    .info-value {
+
+      text-align: right;
+
+      font-weight: 600;
+
+    }
+
+
+
+    /* STATUS */
+
+    .status-card {
+
+      position: relative;
+
+      overflow: hidden;
+
+    }
+
+
+
+    .status-header {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 15px;
+
+    }
+
+
+
+    .status-title {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 9px;
+
+      font-size: 15px;
+
+      font-weight: 700;
+
+    }
+
+
+
+    .live-badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 6px;
+
+      padding: 6px 10px;
+
+      border-radius: 20px;
+
+      background: rgba(34,197,94,.15);
+
+      color: #4ade80;
+
+      font-size: 10px;
+
+      font-weight: 700;
+
+    }
+
+
+
+    .live-dot {
+
+      width: 7px;
+
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: #4ade80;
+
+      box-shadow: 0 0 10px #4ade80;
+
+    }
+
+
+
+    .status-grid {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 10px;
+
+    }
+
+
+
+    .status-item {
+
+      padding: 13px;
+
+      border-radius: 15px;
+
+      background: rgba(0,0,0,.15);
+
+    }
+
+
+
+    .status-label {
+
+      display: block;
+
+      margin-bottom: 6px;
+
+      color: #aaa6c8;
+
+      font-size: 10px;
+
+    }
+
+
+
+    .status-value {
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+    }
+
+
+
+    .online {
+
+      color: #4ade80;
+
+    }
+
+
+
+    .offline {
+
+      color: #fb7185;
+
+    }
+
+
+
+    .checking {
+
+      color: #facc15;
+
+    }
+
+
+
+    .last-check {
+
+      margin-top: 13px;
+
       text-align: center;
-      cursor: pointer;
+
+      color: #aaa6c8;
+
+      font-size: 10px;
+
+    }
+
+
+
+    /* CONTACT */
+
+    .contact-list {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 10px;
+
+    }
+
+
+
+    .contact-btn {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      padding: 13px 15px;
+
+      color: #fff;
+
+      text-decoration: none;
+
+      border-radius: 14px;
+
+      background: rgba(255,255,255,.07);
+
+      border: 1px solid rgba(255,255,255,.08);
+
+      transition: .25s ease;
+
+    }
+
+
+
+    .contact-btn:hover {
+
+      transform: translateY(-2px);
+
+      background: rgba(255,255,255,.13);
+
+    }
+
+
+
+    .contact-left {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 12px;
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+    }
+
+
+
+    .contact-left i {
+
+      width: 20px;
+
+      text-align: center;
+
+    }
+
+
+
+    .whatsapp i { color: #25D366; }
+
+    .facebook i { color: #1877F2; }
+
+    .messenger i { color: #00B2FF; }
+
+    .github i { color: #fff; }
+
+
+
+    .contact-btn > i {
+
+      color: #aaa;
+
+      font-size: 11px;
+
+    }
+
+
+
+    /* STATUS PAGE BUTTON */
+
+    .status-page-btn {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 9px;
+
+      width: 100%;
+
+      margin-top: 15px;
+
+      padding: 13px;
+
+      border-radius: 14px;
+
+      color: #fff;
+
+      text-decoration: none;
+
       font-size: 12px;
+
+      font-weight: 700;
+
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+
+      transition: .25s ease;
+
     }
 
-    .menu-item div {
-      font-size: 21px;
-      margin-bottom: 4px;
+
+
+    .status-page-btn:hover {
+
+      transform: translateY(-2px);
+
+      box-shadow: 0 10px 25px rgba(99,102,241,.3);
+
     }
 
-    .menu-item.active {
-      color: #2ce0ad;
+
+
+    /* FOOTER */
+
+    footer {
+
+      margin-top: 22px;
+
+      padding-top: 18px;
+
+      text-align: center;
+
+      border-top: 1px solid rgba(255,255,255,.08);
+
+      color: #aaa6c8;
+
+      font-size: 10px;
+
+      line-height: 1.7;
+
     }
 
-    @media (max-width: 700px) {
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
 
-      .big-card {
-        grid-column: span 2;
-      }
+
+    footer strong {
+
+      color: #fff;
+
     }
 
-    @media (max-width: 430px) {
+
+
+    /* MOBILE */
+
+    @media (max-width: 400px) {
+
       .container {
-        padding: 12px;
+
+        padding: 20px;
+
       }
 
-      .card {
-        min-height: 105px;
-        padding: 14px;
+
+
+      .profile h1 {
+
+        font-size: 23px;
+
       }
 
-      .card h2 {
-        font-size: 20px;
-      }
 
-      .buttons {
+
+      .status-grid {
+
         grid-template-columns: 1fr;
+
       }
+
     }
+
   </style>
+
 </head>
+
+
 
 <body>
 
-  <header class="header">
-    <h2>📊 Admin Panel</h2>
-    <div class="user-icon">A</div>
-  </header>
+
 
   <main class="container">
 
-    <section class="welcome">
-      <h3>স্বাগতম, Admin 👋</h3>
-      <p>আপনার ড্যাশবোর্ডের সম্পূর্ণ তথ্য এখানে দেখুন</p>
-    </section>
 
-    <section class="stats">
 
-      <div class="card">
-        <div class="emoji">👥</div>
-        <h2 id="users">190</h2>
-        <p>মোট ইউজার</p>
-      </div>
+    <!-- PROFILE -->
 
-      <div class="card">
-        <div class="emoji">⏱️</div>
-        <h2>14h 48m</h2>
-        <p>Active Time</p>
-      </div>
+    <section class="profile">
 
-      <div class="card">
-        <div class="emoji">📦</div>
-        <h2>15,655</h2>
-        <p>মোট অর্ডার</p>
-      </div>
 
-      <div class="card">
-        <div class="emoji">🚀</div>
-        <h2>711</h2>
-        <p>সফল কাজ</p>
-      </div>
 
-      <div class="card">
-        <div class="emoji">💥</div>
-        <h2>577</h2>
-        <p>আজকের ভিজিটর</p>
-      </div>
+      <img
 
-      <div class="card">
-        <div class="emoji">⏳</div>
-        <h2>171h 21m</h2>
-        <p>মোট সময়</p>
-      </div>
+        src="https://i.imgur.com/WS6lzuc.jpeg"
 
-      <div class="card big-card">
-        <div class="emoji">📈</div>
-        <h2>24.14%</h2>
-        <p>Conversion Rate</p>
-      </div>
+        class="profile-photo"
+
+        alt="SHAHADAT SAHU">
+
+
+
+      <h1>SHAHADAT SAHU</h1>
+
+
+
+      <p class="tagline">
+
+        Student • Chatbot Developer
+
+      </p>
+
+
 
     </section>
 
-    <section class="panel">
-      <div class="panel-title">
-        <h3>📊 Weekly Statistics</h3>
-        <span class="live">● Live</span>
+
+
+
+
+    <!-- PERSONAL INFORMATION -->
+
+    <section class="card">
+
+
+
+      <div class="card-title">
+
+        <i class="fa-solid fa-user"></i>
+
+        Personal Information
+
       </div>
 
-      <div class="message">
-        ✅ আপনার ড্যাশবোর্ড সফলভাবে চালু আছে
+
+
+      <div class="info-row">
+
+        <span class="info-label">Name</span>
+
+        <span class="info-value">SHAHADAT SAHU</span>
+
       </div>
 
-      <div class="chart">
-        <div class="bar" style="height: 45%;"><span>45</span></div>
-        <div class="bar" style="height: 65%;"><span>65</span></div>
-        <div class="bar" style="height: 55%;"><span>55</span></div>
-        <div class="bar" style="height: 82%;"><span>82</span></div>
-        <div class="bar" style="height: 70%;"><span>70</span></div>
-        <div class="bar" style="height: 92%;"><span>92</span></div>
-        <div class="bar" style="height: 75%;"><span>75</span></div>
+
+
+      <div class="info-row">
+
+        <span class="info-label">Education</span>
+
+        <span class="info-value">HSC</span>
+
       </div>
 
-      <div class="buttons">
-        <button onclick="addUser()">➕ ইউজার যোগ করুন</button>
-        <button onclick="notification()">🔔 নোটিফিকেশন</button>
-        <button onclick="refreshPage()">🔄 ডাটা রিফ্রেশ</button>
+
+
+      <div class="info-row">
+
+        <span class="info-label">Gender</span>
+
+        <span class="info-value">Male</span>
+
       </div>
+
+
+
+      <div class="info-row">
+
+        <span class="info-label">Relation</span>
+
+        <span class="info-value">Single</span>
+
+      </div>
+
+
+
+      <div class="info-row">
+
+        <span class="info-label">Age</span>
+
+        <span class="info-value">18+</span>
+
+      </div>
+
+
+
+      <div class="info-row">
+
+        <span class="info-label">Religion</span>
+
+        <span class="info-value">Islam</span>
+
+      </div>
+
+
+
+      <div class="info-row">
+
+        <span class="info-label">Address</span>
+
+        <span class="info-value">Khagrachhari, BD</span>
+
+      </div>
+
+
+
     </section>
+
+
+
+
+
+    <!-- SYSTEM STATUS -->
+
+    <section class="card status-card">
+
+
+
+      <div class="status-header">
+
+
+
+        <div class="status-title">
+
+          <i class="fa-solid fa-server"></i>
+
+          System Status
+
+        </div>
+
+
+
+        <span class="live-badge">
+
+          <span class="live-dot"></span>
+
+          LIVE
+
+        </span>
+
+
+
+      </div>
+
+
+
+      <div class="status-grid">
+
+
+
+        <div class="status-item">
+
+          <span class="status-label">BOT STATUS</span>
+
+          <span id="botStatus" class="status-value checking">
+
+            CHECKING...
+
+          </span>
+
+        </div>
+
+
+
+        <div class="status-item">
+
+          <span class="status-label">WEBSITE</span>
+
+          <span id="websiteStatus" class="status-value checking">
+
+            CHECKING...
+
+          </span>
+
+        </div>
+
+
+
+        <div class="status-item">
+
+          <span class="status-label">UPTIME</span>
+
+          <span id="uptime" class="status-value">
+
+            --
+
+          </span>
+
+        </div>
+
+
+
+        <div class="status-item">
+
+          <span class="status-label">RESPONSE</span>
+
+          <span id="responseTime" class="status-value">
+
+            --
+
+          </span>
+
+        </div>
+
+
+
+      </div>
+
+
+
+      <div id="lastCheck" class="last-check">
+
+        Checking system...
+
+      </div>
+
+
+
+      <!-- UptimeRobot Public Status Page -->
+
+      <a
+
+        href="YOUR_UPTIMEROBOT_STATUS_PAGE"
+
+        target="_blank"
+
+        rel="noopener noreferrer"
+
+        class="status-page-btn">
+
+
+
+        <i class="fa-solid fa-chart-line"></i>
+
+        View Full System Status
+
+
+
+      </a>
+
+
+
+    </section>
+
+
+
+
+
+    <!-- CONTACT -->
+
+    <section class="card">
+
+
+
+      <div class="card-title">
+
+        <i class="fa-solid fa-address-book"></i>
+
+        Contact Me
+
+      </div>
+
+
+
+      <div class="contact-list">
+
+
+
+        <a
+
+          href="https://wa.me/+8801882333052"
+
+          target="_blank"
+
+          class="contact-btn whatsapp">
+
+
+
+          <span class="contact-left">
+
+            <i class="fa-brands fa-whatsapp"></i>
+
+            WhatsApp
+
+          </span>
+
+
+
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+
+
+        </a>
+
+
+
+
+
+        <a
+
+          href="https://facebook.com/100044713412032"
+
+          target="_blank"
+
+          class="contact-btn facebook">
+
+
+
+          <span class="contact-left">
+
+            <i class="fa-brands fa-facebook"></i>
+
+            Facebook
+
+          </span>
+
+
+
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+
+
+        </a>
+
+
+
+
+
+        <a
+
+          href="https://m.me/100044713412032"
+
+          target="_blank"
+
+          class="contact-btn messenger">
+
+
+
+          <span class="contact-left">
+
+            <i class="fa-brands fa-facebook-messenger"></i>
+
+            Messenger
+
+          </span>
+
+
+
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+
+
+        </a>
+
+
+
+
+
+        <a
+
+          href="https://gitlab.com/shahadat-sahu"
+
+          target="_blank"
+
+          class="contact-btn github">
+
+
+
+          <span class="contact-left">
+
+            <i class="fa-brands fa-github"></i>
+
+            GitHub
+
+          </span>
+
+
+
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+
+
+        </a>
+
+
+
+      </div>
+
+
+
+    </section>
+
+
+
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+
+
+      <strong>SHAHADAT SAHU</strong><br>
+
+
+
+      Personal Profile • System Status
+
+
+
+      <br>
+
+
+
+      © <span id="year"></span> All Rights Reserved.
+
+
+
+    </footer>
+
+
 
   </main>
 
-  <nav class="bottom-menu">
-    <div class="menu-item active">
-      <div>🏠</div>
-      হোম
-    </div>
 
-    <div class="menu-item">
-      <div>📊</div>
-      রিপোর্ট
-    </div>
 
-    <div class="menu-item">
-      <div>📋</div>
-      অর্ডার
-    </div>
 
-    <div class="menu-item">
-      <div>📁</div>
-      ফাইল
-    </div>
-
-    <div class="menu-item">
-      <div>⚙️</div>
-      সেটিংস
-    </div>
-  </nav>
 
   <script>
-    function addUser() {
-      const userBox = document.getElementById("users");
-      let users = Number(userBox.innerText);
-      userBox.innerText = users + 1;
-      alert("নতুন ইউজার যোগ হয়েছে!");
+
+
+
+    /*
+
+     * ==========================================
+
+     * SYSTEM STATUS API
+
+     * ==========================================
+
+     *
+
+     * Backend endpoint example:
+
+     *
+
+     * GET /api/status
+
+     *
+
+     * Expected JSON:
+
+     *
+
+     * {
+
+     *   "bot": "online",
+
+     *   "website": "online",
+
+     *   "uptime": "99.99%",
+
+     *   "responseTime": "245 ms"
+
+     * }
+
+     *
+
+     * IMPORTANT:
+
+     * UptimeRobot API KEY কখনো এই HTML-এর মধ্যে রাখবে না।
+
+     */
+
+
+
+    const STATUS_API = "/api/status";
+
+
+
+
+
+    function setStatus(elementId, status) {
+
+
+
+      const element = document.getElementById(elementId);
+
+
+
+      if (!element) return;
+
+
+
+      if (status === "online") {
+
+
+
+        element.textContent = "● ONLINE";
+
+        element.className = "status-value online";
+
+
+
+      } else if (status === "offline") {
+
+
+
+        element.textContent = "● OFFLINE";
+
+        element.className = "status-value offline";
+
+
+
+      } else {
+
+
+
+        element.textContent = "CHECKING...";
+
+        element.className = "status-value checking";
+
+
+
+      }
+
     }
 
-    function notification() {
-      alert("আপনার কোনো নতুন নোটিফিকেশন নেই।");
+
+
+
+
+    async function loadSystemStatus() {
+
+
+
+      try {
+
+
+
+        const response = await fetch(
+
+          STATUS_API + "?t=" + Date.now(),
+
+          {
+
+            method: "GET",
+
+            cache: "no-store"
+
+          }
+
+        );
+
+
+
+        if (!response.ok) {
+
+          throw new Error("Status API unavailable");
+
+        }
+
+
+
+        const data = await response.json();
+
+
+
+
+
+        setStatus(
+
+          "botStatus",
+
+          data.bot || "unknown"
+
+        );
+
+
+
+
+
+        setStatus(
+
+          "websiteStatus",
+
+          data.website || "unknown"
+
+        );
+
+
+
+
+
+        document.getElementById("uptime").textContent =
+
+          data.uptime || "--";
+
+
+
+
+
+        document.getElementById("responseTime").textContent =
+
+          data.responseTime || "--";
+
+
+
+
+
+        document.getElementById("lastCheck").textContent =
+
+          "Last checked: Just now";
+
+
+
+
+
+      } catch (error) {
+
+
+
+        setStatus("botStatus", "offline");
+
+        setStatus("websiteStatus", "offline");
+
+
+
+        document.getElementById("uptime").textContent = "--";
+
+        document.getElementById("responseTime").textContent = "--";
+
+
+
+        document.getElementById("lastCheck").textContent =
+
+          "Status temporarily unavailable";
+
+
+
+      }
+
+
+
     }
 
-    function refreshPage() {
-      alert("ডাটা রিফ্রেশ হয়েছে!");
-      location.reload();
-    }
 
-    const menuItems = document.querySelectorAll(".menu-item");
 
-    menuItems.forEach(function(item) {
-      item.addEventListener("click", function() {
-        menuItems.forEach(function(menu) {
-          menu.classList.remove("active");
-        });
 
-        item.classList.add("active");
-      });
-    });
+
+    /* Initial check */
+
+    loadSystemStatus();
+
+
+
+
+
+    /* Auto refresh every 60 seconds */
+
+    setInterval(
+
+      loadSystemStatus,
+
+      60 * 1000
+
+    );
+
+
+
+
+
+    /* Dynamic year */
+
+    document.getElementById("year").textContent =
+
+      new Date().getFullYear();
+
+
+
   </script>
 
+
+
 </body>
+
 </html>
