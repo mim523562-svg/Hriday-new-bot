@@ -1,48 +1,8 @@
 /**
  * ╔══════════════════════════════════════════════╗
- * ║              🎙️ TEXT VOICE BOT              ║
+ * ║          🎙️ HRIDOY TEXT VOICE V9            ║
  * ║        💠 HRIDOY HASAN SHANTO 💠            ║
- * ║       MIRAI + GOATBOT COMPATIBLE             ║
- * ║          RANDOM ONE-OF VOICE SYSTEM          ║
- * ╚══════════════════════════════════════════════╝
- */
-
-const axios = require("axios");
-const fs = require("fs-extra");
-const path = require("path");
-
-// ═══════════════════════════════════════════════
-// 🎙️ TEXT / EMOJI → VOICE MAP
-// ═══════════════════════════════════════════════
-
-const textAudioMap = {
-
-  "আই লাভ ইউ": [
-    "https://files.catbox.moe/z96wll.mp3"
-  ],
-
-  "🥱": [
-    "https://files.catbox.moe/mofu8n.mp3"
-  ],
-
-  "ভয়েস": [
-    "https://files.catbox.moe/b973ms.mp4"
-  ],
-
-  "🤏": [
-    "https://files.catbox.moe/8w1wo5.mp3"
-  ],
-
-  "এহ": [
-    "https://files.catbox.moe/6tkyn2.mp3"
-  ],
-
-  "ডিলেট": [
-/**
- * ╔══════════════════════════════════════════════╗
- * ║          🎙️ HRIDOY TEXT VOICE V8            ║
- * ║        💠 HRIDOY HASAN SHANTO 💠            ║
- * ║     ALL-IN-ONE RANDOM VOICE + ON/OFF         ║
+ * ║           MIRAI BOT COMPATIBLE               ║
  * ╚══════════════════════════════════════════════╝
  */
 
@@ -53,36 +13,19 @@ const path = require("path");
 const CACHE_DIR = path.join(__dirname, "cache");
 const STATE_FILE = path.join(__dirname, "voiceState.json");
 
-// ================================================
-// 🎛️ PERSISTENT VOICE SWITCH
-// ================================================
-
-function isVoiceEnabled() {
-  try {
-    if (!fs.existsSync(STATE_FILE)) return true;
-    return fs.readJsonSync(STATE_FILE).enabled !== false;
-  } catch {
-    return true;
-  }
-}
-
-async function setVoiceEnabled(enabled) {
-  await fs.ensureDir(__dirname);
-  await fs.writeJson(STATE_FILE, { enabled }, { spaces: 2 });
-}
-
-// ================================================
-// 🎙️ TEXT / EMOJI VOICE MAP
-// তোমার দেওয়া সব URL এখানে রাখা হয়েছে
-// ================================================
-
 const textAudioMap = {
   "🤖": ["https://files.catbox.moe/l0jhdq.mp3"],
+  "আই লাভ ইউ": ["https://files.catbox.moe/z96wll.mp3"],
+  "i love you": ["https://files.catbox.moe/y3fk8i.mp3"],
+  "love you": ["https://files.catbox.moe/y3fk8i.mp3"],
+
   "🥱": [
     "https://files.catbox.moe/mofu8n.mp3",
     "https://files.catbox.moe/088yxs.mp3"
   ],
+
   "ভয়েস": ["https://files.catbox.moe/b973ms.mp4"],
+  "ভয়েস": ["https://files.catbox.moe/b973ms.mp4"],
   "🤏": ["https://files.catbox.moe/8w1wo5.mp3"],
   "এহ": ["https://files.catbox.moe/6tkyn2.mp3"],
   "ডিলেট": ["https://files.catbox.moe/kcemka.mp4"],
@@ -95,8 +38,6 @@ const textAudioMap = {
   "গুড নাইট": ["https://files.catbox.moe/i29m4q.mp3"],
   "good morning": ["https://files.catbox.moe/8gzqx5.mp3"],
   "গুড মর্নিং": ["https://files.catbox.moe/8gzqx5.mp3"],
-  "i love you": ["https://files.catbox.moe/y3fk8i.mp3"],
-  "love you": ["https://files.catbox.moe/y3fk8i.mp3"],
   "@everyone": ["https://files.catbox.moe/3u6shs.mp3"],
   "ভুদা": ["https://files.catbox.moe/gnyx0p.mp3"],
   "by": ["https://files.catbox.moe/fdqh2m.mp3"],
@@ -106,6 +47,7 @@ const textAudioMap = {
   "🤨": ["https://files.catbox.moe/995anc.mp3"],
   "dirim": ["https://files.catbox.moe/1rk48q.mp4"],
   "চুদি": ["https://files.catbox.moe/0ykb7f.mp3"],
+
   "☺️": ["https://files.catbox.moe/p2mi4u.mp3"],
   "😊": ["https://files.catbox.moe/p2mi4u.mp3"],
   "🌚": ["https://files.catbox.moe/ze3wu1.mp3"],
@@ -140,30 +82,6 @@ const textAudioMap = {
   "👍": ["https://files.catbox.moe/mkvysb.mp3"]
 };
 
-// ================================================
-// 🛡️ DUPLICATE PROTECTION
-// ================================================
-
-const processedMessages = new Set();
-
-function alreadyProcessed(id) {
-  if (!id) return false;
-
-  const key = String(id);
-  if (processedMessages.has(key)) return true;
-
-  processedMessages.add(key);
-
-  setTimeout(() => processedMessages.delete(key), 30000);
-
-  if (processedMessages.size > 5000) {
-    const oldest = processedMessages.values().next().value;
-    processedMessages.delete(oldest);
-  }
-
-  return false;
-}
-
 function normalize(value) {
   return String(value || "")
     .normalize("NFC")
@@ -172,124 +90,138 @@ function normalize(value) {
     .toLowerCase();
 }
 
-function getRandomVoice(key) {
-  const list = textAudioMap[key];
-  if (!Array.isArray(list) || list.length === 0) return null;
-
-  return list[Math.floor(Math.random() * list.length)];
+function isVoiceEnabled() {
+  try {
+    if (!fs.existsSync(STATE_FILE)) return true;
+    return fs.readJsonSync(STATE_FILE).enabled !== false;
+  } catch (error) {
+    console.error("[VOICE STATE]", error.message);
+    return true;
+  }
 }
 
-// ================================================
-// 📋 HELP MENU
-// ================================================
+async function setVoiceEnabled(enabled) {
+  await fs.ensureDir(__dirname);
+  await fs.writeJson(
+    STATE_FILE,
+    { enabled: Boolean(enabled) },
+    { spaces: 2 }
+  );
+}
 
-const voiceList = `
+function getRandomVoice(body) {
+  const key = normalize(body);
+
+  for (const [trigger, urls] of Object.entries(textAudioMap)) {
+    if (normalize(trigger) === key && urls.length) {
+      return urls[Math.floor(Math.random() * urls.length)];
+    }
+  }
+
+  return null;
+}
+
+const processed = new Set();
+
+function alreadyProcessed(id) {
+  if (!id) return false;
+
+  const key = String(id);
+  if (processed.has(key)) return true;
+
+  processed.add(key);
+
+  setTimeout(() => processed.delete(key), 30000);
+
+  if (processed.size > 2000) {
+    processed.delete(processed.values().next().value);
+  }
+
+  return false;
+}
+
+const helpText = `
 ╔══════════════════════════════╗
-     🎙️ HRIDOY TEXT VOICE V8
+       🎙️ HRIDOY TEXT VOICE V9
 ╚══════════════════════════════╝
 
-🎛️ VOICE CONTROL
-🟢 .voice on
-🔴 .voice off
-📊 .voice status
+🎛️ CONTROL
+.voice on
+.voice off
+.voice status
 
-🎙️ TEXT TRIGGERS
-🤖 🥱 🤏 🤦‍♂️ 🫠 🤨
-ভয়েস | এহ | ডিলেট
-mata beta | সর বাল | কেউ নাই
-good night | গুড নাইট
-good morning | গুড মর্নিং
-i love you | love you
-@everyone | ভুদা
-by | বাই | বায়
-dirim | চুদি
+📋 LIST
+voice list
+ভয়েস লিস্ট
 
-😄 EMOJI VOICE
-☺️ 😊 🌚 🌝 🐸 👀 🖕
-😁 🤣 😆 😑 😅 😍 😒
-💋 😘 😡 🤬 😩 😭 🙂
-🙏 😂 🤭 🥰 🥵 🥺
-🥹 🫶 🫣 🍼 👍
-
-💠 ADMIN: HRIDOY HASAN SHANTO
-🎲 RANDOM VOICE SYSTEM
-🛡️ ONE MESSAGE = ONE PROCESS
+💠 HRIDOY HASAN SHANTO 💠
 `;
-
-// ================================================
-// ⚙️ MODULE CONFIG
-// ================================================
 
 module.exports.config = {
   name: "text_voice",
-  version: "8.0.0",
+  version: "9.0.0",
   hasPermssion: 0,
-  role: 0,
   credits: "💠 HRIDOY HASAN SHANTO 💠",
-  author: "HRIDOY HASAN SHANTO",
-  description: "All-in-One Text/Emoji Voice ON/OFF",
-  shortDescription: "Text Voice Control",
-  longDescription: "Random voice with persistent ON/OFF switch",
+  description: "Mirai text voice and persistent ON/OFF",
   commandCategory: "noprefix",
-  category: "noprefix",
-  usages: ".voice on/off/status অথবা Text/Emoji",
-  cooldowns: 2,
-  countDown: 2
+  usages: ".voice on/off/status",
+  cooldowns: 1
 };
-
-// ================================================
-// 🎙️ CORE HANDLER
-// ================================================
 
 async function processVoice(api, event) {
   if (!api || !event || !event.threadID) return;
 
+  const body = normalize(event.body);
   const threadID = event.threadID;
   const messageID = event.messageID;
-  const key = normalize(event.body);
 
-  if (!key) return;
+  if (!body) return;
 
-  // Voice control commands
-  if (key === ".voice on" || key === ".voice off" || key === ".voice status") {
-    const action = key.split(/\s+/)[1];
+  // ON/OFF/STATUS commands
+  if ([".voice on", ".voice off", ".voice status"].includes(body)) {
+    if (alreadyProcessed(messageID)) return;
 
     try {
-      if (action === "on") await setVoiceEnabled(true);
-      if (action === "off") await setVoiceEnabled(false);
+      if (body === ".voice on") {
+        await setVoiceEnabled(true);
+      } else if (body === ".voice off") {
+        await setVoiceEnabled(false);
+      }
 
       const enabled = isVoiceEnabled();
 
+      const message = body === ".voice status"
+        ? `🎙️ Voice Status: ${enabled ? "🟢 ON" : "🔴 OFF"}`
+        : `🎙️ Text Voice ${enabled ? "🟢 ON" : "🔴 OFF"} করা হয়েছে!`;
+
       return api.sendMessage(
-        enabled
-          ? "🟢 সব অটো ভয়েস চালু আছে!\n💠 HRIDOY HASAN SHANTO"
-          : "🔴 সব অটো ভয়েস বন্ধ আছে!\n💠 HRIDOY HASAN SHANTO",
+        `${message}\n💠 HRIDOY HASAN SHANTO 💠`,
         threadID,
         messageID
       );
     } catch (error) {
-      console.error("[VOICE CONTROL]", error.message);
+      console.error("[VOICE CONTROL]", error.stack || error);
+
       return api.sendMessage(
-        "❌ Voice setting save করা যায়নি।",
+        "❌ Voice setting save করা যায়নি।",
         threadID,
         messageID
       );
     }
   }
 
-  if (["voice list", "voicelist", "text voice", "textvoice",
-       "ভয়েস লিস্ট", "ভয়েস লিস্ট", "ভয়েস লিস্ট দাও", "🎤",
-       "command list"].includes(key)) {
+  if (
+    ["voice list", "voicelist", "text voice", "textvoice",
+     "ভয়েস লিস্ট", "ভয়েস লিস্ট", "🎤"].includes(body)
+  ) {
     if (alreadyProcessed(messageID)) return;
-    return api.sendMessage(voiceList, threadID, messageID);
+    return api.sendMessage(helpText, threadID, messageID);
   }
 
-  // Do not play voice while disabled
   if (!isVoiceEnabled()) return;
-
   if (alreadyProcessed(messageID)) return;
 
-  const audioUrl = getRandomVoice(key);
+  const audioUrl = getRandomVoice(body);
   if (!audioUrl) return;
 
   let filePath;
@@ -297,32 +229,34 @@ async function processVoice(api, event) {
   try {
     await fs.ensureDir(CACHE_DIR);
 
-    const extension = /\.mp4(?:$|\?)/i.test(audioUrl) ? ".mp4" : ".mp3";
-    const safeID = String(messageID || Date.now()).replace(/[^a-zA-Z0-9_-]/g, "");
+    const extension = /\.mp4(?:\?|$)/i.test(audioUrl)
+      ? ".mp4"
+      : ".mp3";
+
+    const safeID = String(messageID || Date.now())
+      .replace(/[^a-zA-Z0-9_-]/g, "");
 
     filePath = path.join(CACHE_DIR, `voice_${safeID}${extension}`);
 
     const response = await axios.get(audioUrl, {
-      responseType: "stream",
-      timeout: 30000,
+      responseType: "arraybuffer",
+      timeout: 25000,
       maxRedirects: 5,
       validateStatus: status => status >= 200 && status < 300
     });
 
-    await new Promise((resolve, reject) => {
-      const writer = fs.createWriteStream(filePath);
-      response.data.on("error", reject);
-      writer.on("error", reject);
-      writer.on("finish", resolve);
-      response.data.pipe(writer);
-    });
+    if (!response.data || response.data.byteLength === 0) {
+      throw new Error("Empty audio response");
+    }
+
+    await fs.writeFile(filePath, response.data);
 
     await new Promise((resolve, reject) => {
-      let settled = false;
+      let doneOnce = false;
 
       const done = error => {
-        if (settled) return;
-        settled = true;
+        if (doneOnce) return;
+        doneOnce = true;
         error ? reject(error) : resolve();
       };
 
@@ -338,40 +272,22 @@ async function processVoice(api, event) {
       }
     });
   } catch (error) {
-    console.error("[TEXT_VOICE ERROR]", error.message);
+    console.error("[TEXT VOICE ERROR]", error.stack || error);
   } finally {
     if (filePath) {
-      setTimeout(() => fs.remove(filePath).catch(() => {}), 3000);
+      setTimeout(() => {
+        fs.remove(filePath).catch(() => {});
+      }, 10000);
     }
   }
 }
 
-// ================================================
-// 🐐 GOATBOT HANDLERS
-// ================================================
-
-module.exports.onStart = async function ({ api, event }) {
-  return processVoice(api, event);
-};
-
-module.exports.onChat = async function ({ api, event }) {
-  return processVoice(api, event);
-};
-
+// Keep one event handler only.
 module.exports.handleEvent = async function ({ api, event }) {
   return processVoice(api, event);
 };
 
-// ================================================
-// 🤖 MIRAI COMPATIBILITY
-// ================================================
-
-module.exports.run = async function ({
-  api,
-  event,
-  args,
-  threadID
-}) {
+module.exports.run = async function ({ api, event, args, threadID }) {
   const currentEvent = event || {
     threadID,
     messageID: null,
